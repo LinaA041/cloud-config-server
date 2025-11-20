@@ -11,6 +11,28 @@ eureka:
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE:http://localhost:8761/eureka}
   instance:
-    hostname: ${EUREKA_INSTANCE:localhost}
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.value}
+# Zipkin (tracing distribuido)
+spring.zipkin:
+  base-url: ${SPRING_ZIPKIN_BASE_URL:http://localhost:9411/}
 
+# Actuator endpoints (para monitoreo - Punto 6)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
 
+# Logging común
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  level:
+    root: INFO
