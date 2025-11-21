@@ -1,0 +1,56 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: SERVICE-DISCOVERY
+
+# Configuración de Eureka Server
+eureka:
+  instance:
+    hostname: service-discovery
+    prefer-ip-address: true
+  client:
+    register-with-eureka: false  # Eureka no se registra a sí mismo
+    fetch-registry: false
+    service-url:
+      defaultZone: http://service-discovery:8761/eureka/
+  server:
+    enable-self-preservation: true
+    eviction-interval-timer-in-ms: 10000
+    peer-node-read-timeout-ms: 5000  # Aumentar timeout para evitar errores
+
+# Resilience4j Circuit Breaker
+resilience4j:
+  circuitbreaker:
+    instances:
+      serviceDiscovery:
+        register-health-indicator: true
+        event-consumer-buffer-size: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        failure-rate-threshold: 50
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        sliding-window-size: 10
+        wait-duration-in-open-state: 5s
+        sliding-window-type: COUNT_BASED
+
+# Management endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreakers:
+      enabled: true
+
+# Logging
+logging:
+  level:
+    com.netflix.eureka: INFO
+    com.netflix.discovery: INFO
+    org.springframework.web: INFO
